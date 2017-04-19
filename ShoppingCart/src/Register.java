@@ -49,7 +49,7 @@ public class Register extends JPanel {
 				addUser(newuserName.getText(), newuserPassword.getPassword());
 				String registerResponse = addUser(newuserName.getText(), newuserPassword.getPassword());
 				if (registerResponse.equals(newuserName.getText())){
-					lblSuccess.setText("New User Created: " + registerResponse);
+					lblSuccess.setText("New Person Created: " + registerResponse);
 				}else{
 					lblSuccess.setText("ERROR: " + registerResponse);
 				}
