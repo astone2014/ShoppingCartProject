@@ -1,9 +1,6 @@
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -15,6 +12,7 @@ public class LoginWindow extends JFrame {
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					frame = new LoginWindow();
@@ -43,6 +41,7 @@ public class LoginWindow extends JFrame {
 		JButton btnRegister = new JButton("Register");
 		login.add(btnRegister);
 		btnRegister.addActionListener(new ActionListener() { // switch between login and registration
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(login.isVisible()){
 					register.add(btnRegister);

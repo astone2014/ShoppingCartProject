@@ -2,12 +2,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 
 public class Register extends JPanel {
 	private JTextField newuserName;
@@ -43,6 +41,7 @@ public class Register extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				System.out.println("Clicked Register");
+				addUser(null, null);
 				JLabel lblRegisteredSuccessfully = new JLabel("Registered Successfully");
 				lblRegisteredSuccessfully.setBounds(165, 237, 113, 14);
 				add(lblRegisteredSuccessfully);

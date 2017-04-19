@@ -3,8 +3,6 @@ import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -26,7 +24,6 @@ public class Login extends JPanel {
 	 * Create the panel.
 	 */
 	public Login() {
-		JFrame motherpanel = (JFrame)SwingUtilities.getRoot(this);
 		login = this;
 		login.setLayout(null);
 
