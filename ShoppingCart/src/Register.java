@@ -18,6 +18,7 @@ public class Register extends JPanel {
 	public Register() {
 		register = this;
 		register.setLayout(null);
+		setLayout(null);
 
 		newuserName = new JTextField();
 		newuserName.setBounds(171, 112, 90, 20);
@@ -36,23 +37,43 @@ public class Register extends JPanel {
 		lblPassword.setBounds(72, 145, 63, 14);
 		register.add(lblPassword);
 
+		JLabel lblSuccess = new JLabel("Success");
+		lblSuccess.setBounds(10, 47, 430, 14);
+		add(lblSuccess);
+		lblSuccess.setVisible(false);
+		
 		JButton btnRegister = new JButton("Register");
 		btnRegister.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("Clicked Register");
-				addUser(null, null);
-				JLabel lblRegisteredSuccessfully = new JLabel("Registered Successfully");
-				lblRegisteredSuccessfully.setBounds(165, 237, 113, 14);
-				add(lblRegisteredSuccessfully);
-			}
-
-			private String addUser(String user, char[] pass) {
-				// TODO Auto-generated method stub
-				return null;
+				addUser(newuserName.getText(), newuserPassword.getPassword());
+				String registerResponse = addUser(newuserName.getText(), newuserPassword.getPassword());
+				if (registerResponse.equals(newuserName.getText())){
+					lblSuccess.setText("New User Created: " + registerResponse);
+				}else{
+					lblSuccess.setText("ERROR: " + registerResponse);
+				}
+				lblSuccess.setVisible(true);
+				register.revalidate();
+				register.repaint();
 			}
 		});
 		btnRegister.setBounds(172, 203, 89, 23);
 		register.add(btnRegister);
+	}
+	
+	private String addUser(String user, char[] pass) {
+		String parsedPass = new String(pass);
+		System.out.println(user + "\n" + parsedPass);
+		if(user.isEmpty() && parsedPass.isEmpty()){
+			return "You must enter a username & password";
+		}else if(user.isEmpty()){
+			return "You must enter a username";
+		}else if(parsedPass.isEmpty()){
+			return "You must enter a password";
+		}else if((user.isEmpty() && parsedPass.isEmpty()) == false){
+			return user;
+		}
+		return "Failed Registration";
 	}
 }

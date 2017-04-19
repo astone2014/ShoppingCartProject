@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JLabel;
 
 public class LoginWindow extends JFrame {
 	private static LoginWindow frame;
@@ -30,7 +31,7 @@ public class LoginWindow extends JFrame {
 	public LoginWindow() {
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(250, 250, 450, 300);
 		
 		Register register = new Register(); // initialize register
 		
