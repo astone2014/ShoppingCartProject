@@ -42,8 +42,8 @@ public class Register extends JPanel {
 		btnRegister.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("Clicked Register");
-				JLabel lblRegisteredSuccessfully = new JLabel("Registered Successfully");
+				System.out.println("Clicked Resadsgister");
+				JLabel lblRegisteredSuccessfully = new JLabel("Registered Succccasdasessfully");
 				lblRegisteredSuccessfully.setBounds(165, 237, 113, 14);
 				add(lblRegisteredSuccessfully);
 			}
