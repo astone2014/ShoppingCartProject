@@ -1,22 +1,26 @@
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.Box;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+/**
+ * Shopping Cart Project Group 19
+ * 
+ * @author Austen Stone, Reshma Thomas, Arian Tirado
+ *
+ */
 public class View extends JFrame {
 	private JPanel login;
 	private JPanel store;
@@ -36,6 +40,9 @@ public class View extends JFrame {
 	private final JButton btnCheckout = new JButton("Checkout");
 	private final JLabel lblLogin = new JLabel("");
 
+	/**
+	 * Constructor for view
+	 */
 	public View() {
 		login = new JPanel();
 		login.setLayout(null);
@@ -61,56 +68,28 @@ public class View extends JFrame {
 		store.setBorder(new EmptyBorder(10, 5, 10, 5));
 		productsPanel = new JPanel();
 		productsPanel.setLayout(new FlowLayout(0, 10, 10));
-		productsPanel.setBounds(200, 200, 200, 500);
+		productsPanel.setBounds(100, 100, 100, 100);
 
 		checkout = new JPanel();
 		store.setBorder(new EmptyBorder(10, 5, 10, 5));
 		checkoutPanel = new JPanel();
-		checkoutPanel.setLayout(new FlowLayout(0, 10, 10));
-		checkoutPanel.setBounds(200, 200, 200, 500);
+		checkoutPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+		checkoutPanel.setBounds(100, 76, 75, 75);
 
 		admin = new JPanel();
 		admin.setLayout(null);
 
 		getContentPane().add(login);
+
 	}
 
-	public String getUserName() {
-		return userName.getText();
-	}
-
-	public char[] getUserPassword() {
-		return userPassword.getPassword();
-	}
-
-	void addLoginListener(ActionListener listenerForLogin) {
-		btnLogin.addActionListener(listenerForLogin);
-	}
-
-	void addRegisterListener(ActionListener listenerForRegister) {
-		btnRegister.addActionListener(listenerForRegister);
-	}
-
-	public void addSignUpListener(ActionListener listenerForSignUp) {
-		btnSignUp.addActionListener(listenerForSignUp);
-	}
-
-	public void addStoreListener(ActionListener listenerForStore) {
-		btnStore.addActionListener(listenerForStore);
-	}
-
-	public void addCheckoutListener(ActionListener listenerForCheckout) {
-		btnCheckout.addActionListener(listenerForCheckout);
-	}
-
-	public void addLogoutListener(ActionListener listenerForLogout) {
-		btnLogout.addActionListener(listenerForLogout);
-	}
-
-	public void addCartAddListener(ActionListener listenerForCartAdd) {
-		btnLogout.addActionListener(listenerForCartAdd);
-	}
-
+	/**
+	 * Displays the front end of the store or admin page depending on account
+	 * type
+	 *
+	 * @param AccountType
+	 *            The type of the account {1:user, 2:admin}
+	 */
 	void viewLogedIn(int AccountType) {
 		if (AccountType == 1) {
 			getContentPane().remove(login);
@@ -126,7 +105,10 @@ public class View extends JFrame {
 		}
 	}
 
-	void viewRegister() {
+	/**
+	 * Displays the login page or sign up page.
+	 */
+	void viewLoginPage() {
 		getContentPane().remove(store);
 		getContentPane().add(login);
 		if (btnStore.getParent() != null) { // if at store
@@ -147,23 +129,41 @@ public class View extends JFrame {
 		viewRefresh();
 	}
 
-	void viewLogout() {
-		this.removeAll();
+	/**
+	 * Scans the username field for a username
+	 *
+	 * @return username from usernamefield
+	 */
+	public String getUserName() {
+		return userName.getText();
 	}
 
-	void viewRefresh() {
-		getContentPane().repaint();
-		getContentPane().revalidate();
+	/**
+	 * Scans the password field for a password
+	 *
+	 * @return password from password field
+	 */
+	public char[] getUserPassword() {
+		return userPassword.getPassword();
 	}
 
+	/**
+	 * Changes login label to inform user of login changes.
+	 *
+	 * @param string
+	 *            the login message
+	 */
 	public void loginMessage(String string) {
 		lblLogin.setText(string);
-	}
-
-	void viewStore() {
-		viewRefresh();
-	}
-
+	}	
+	
+	/**
+	 * Displays the products from the product csv file.
+	 *
+	 * @param products
+	 *            list(table) of string arrays(rows) that contains product
+	 *            info(cells)
+	 */
 	void viewProducts(List<String[]> products) {
 		if (productsPanel.getParent() == null) {
 			for (String[] product : products) {
@@ -177,8 +177,22 @@ public class View extends JFrame {
 		}
 	}
 
+	/**
+	 * Creates a panel for the product
+	 *
+	 * @param Name
+	 *            name of product
+	 * @param Price
+	 *            price of product
+	 * @param Count
+	 *            how many of the products are in stock
+	 * @param Description
+	 *            a short description of the product
+	 * @return
+	 */
 	JPanel createProductJpanel(String Name, String Price, String Count, String Description) {
 		JPanel newproduct = new JPanel(new GridLayout(4, 2));
+		newproduct.setName(Name);
 		newproduct.setBackground(Color.LIGHT_GRAY);
 		newproduct.setBorder(new EmptyBorder(10, 5, 10, 5));
 		newproduct.add(new JLabel(Name));
@@ -190,29 +204,23 @@ public class View extends JFrame {
 		JLabel description = new JLabel(Description);
 		description.setBounds(100, 100, 100, 100);
 		newproduct.add(description);
-		newproduct.add(new JButton("Buy Now"));
-		return newproduct;
-	}
-
-	JPanel createCartItemJpanel(String Name, String Price, String Count){
-		JPanel newproduct = new JPanel(new GridLayout(4,2));
-		newproduct.setBackground(Color.LIGHT_GRAY);
-		newproduct.setBorder(new EmptyBorder(10,5,10,5));
-		newproduct.add(new JLabel(Name));
-		JLabel image = new JLabel();
-		image.setIcon(new ImageIcon("C:\\Users\\auste\\Downloads\\product.png"));
-		newproduct.add(image);
-		newproduct.add(new JLabel("$" + Price));
-		newproduct.add(new JLabel("Stock: " + Count));
 		JButton buynow = new JButton("Buy Now");
-		buynow.addActionListener(null);
-		newproduct.add(new JButton("Buy Now"));
+		newproduct.add(buynow);
+		buynow.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("Clicked " + newproduct.getName());
+			}
+		});
 		return newproduct;
 	}
 
+	/**
+	 * displays checkout page and reload data.
+	 *
+	 * @param products
+	 */
 	void viewCheckout(List<String[]> products) {
 		if (checkoutPanel.getParent() == null) {
-			System.out.println("Parenet null");
 			for (String[] product : products) {
 				JPanel newCartItem = createCartItemJpanel(product[0], product[1], product[2]);
 				checkoutPanel.add(newCartItem);
@@ -222,5 +230,68 @@ public class View extends JFrame {
 			store.add(checkoutPanel);
 			viewRefresh();
 		}
+	}
+	
+	/**
+	 * Creates a JPanel for the cart item
+	 *
+	 * @param Name
+	 *            name of item
+	 * @param Price
+	 *            price of item
+	 * @param Count
+	 *            count of item
+	 * @return
+	 */
+	JPanel createCartItemJpanel(String Name, String Price, String Count) {
+		JPanel newproduct = new JPanel(new GridLayout(4, 2));
+		newproduct.setBackground(Color.LIGHT_GRAY);
+		newproduct.add(new JLabel(Name));
+		JLabel image = new JLabel();
+		image.setIcon(new ImageIcon("C:\\Users\\auste\\Downloads\\product.png"));
+		newproduct.add(image);
+		newproduct.add(new JLabel("$" + Price));
+		newproduct.add(new JLabel("Stock: " + Count));
+		return newproduct;
+	}
+
+	/**
+	 * Repaints and revalidates the content pane to display changes.
+	 */
+	void viewRefresh() {
+		getContentPane().repaint();
+		getContentPane().revalidate();
+	}
+	
+	public void addCheckoutListener(ActionListener listenerForCheckout) {
+		btnCheckout.addActionListener(listenerForCheckout);
+	}
+
+	void addLoginListener(ActionListener listenerForLogin) {
+		btnLogin.addActionListener(listenerForLogin);
+	}
+
+	public void addLogoutListener(ActionListener listenerForLogout) {
+		btnLogout.addActionListener(listenerForLogout);
+	}
+
+	void addRegisterListener(ActionListener listenerForRegister) {
+		btnRegister.addActionListener(listenerForRegister);
+	}
+
+	public void addSignUpListener(ActionListener listenerForSignUp) {
+		btnSignUp.addActionListener(listenerForSignUp);
+	}
+
+	public void addStoreListener(ActionListener listenerForStore) {
+		btnStore.addActionListener(listenerForStore);
+	}
+	
+	public void addBuyNowListener(ActionListener buyNowListenerm) {
+	}
+
+	public Object getBuyNowName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

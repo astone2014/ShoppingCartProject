@@ -1,10 +1,15 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class Controller {
 	private Model model;
 	private View view;
-	
+	/**
+	 * Controls user input and is the master of model and view
+	 * @param model the database
+	 * @param view the display
+	 */
 	public Controller(Model model, View view){
 		this.model = model;
 		this.view = view;
@@ -15,12 +20,17 @@ public class Controller {
 		this.view.addStoreListener(new StoreListener());
 		this.view.addCheckoutListener(new CheckoutListener());
 		this.view.addLogoutListener(new LogoutListener());
-		this.view.addCartAddListener(new CartAddListener());
+		List<String[]> products = model.getProducts();
+		for(String[] row : products){
+			this.view.addBuyNowListener(new BuyNowListener());
+		}
 	}
+	
 	class LoginListener implements ActionListener{
 		public void actionPerformed(ActionEvent a) {
 			if(model.loginUser(view.getUserName(), view.getUserPassword())){
 				view.viewLogedIn(model.getAccountType());
+				view.viewProducts(model.getProducts());
 			}else{
 				view.loginMessage("No account found. Please Try again.");
 			}
@@ -29,7 +39,7 @@ public class Controller {
 	
 	class RegisterListener implements ActionListener{
 		public void actionPerformed(ActionEvent a) {
-			view.viewRegister();
+			view.viewLoginPage();
 		}
 	}
 	
@@ -57,13 +67,13 @@ public class Controller {
 	
 	class LogoutListener implements ActionListener{
 		public void actionPerformed(ActionEvent a) {
-			view.viewRegister();
+			view.viewLoginPage();
 		}
 	}
 	
-	class CartAddListener implements ActionListener{
+	class BuyNowListener implements ActionListener{
 		public void actionPerformed(ActionEvent a) {
-			System.out.println("added Item");
+			System.out.println("Gekko");
 		}
 	}
 }
