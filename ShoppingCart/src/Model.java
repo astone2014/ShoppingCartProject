@@ -72,4 +72,36 @@ public class Model {
 		}
 		return null;
 	}
+	
+	public List<String[]> getAccountCart() {
+		try {
+			CSVReader reader = new CSVReader(new FileReader("carts.csv"));
+			 List<String[]>readerToReturn = reader.readAll();
+			reader.close();
+			return readerToReturn;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public void cartAdd(String itemName) {
+		String filepath = "carts.csv";
+		String[] nextRow;
+		try {
+			CSVReader reader = new CSVReader(new FileReader(filepath));
+			while ((nextRow = reader.readNext()) != null) {
+				if("1" == nextRow[0]){
+					System.out.println(nextRow[0]);
+				}
+			}
+			reader.close();
+			CSVWriter writer = new CSVWriter(new FileWriter(filepath, true));
+			String[] newAccount = { "", "" };
+			writer.writeNext(newAccount);
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

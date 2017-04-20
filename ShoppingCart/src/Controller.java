@@ -15,6 +15,7 @@ public class Controller {
 		this.view.addStoreListener(new StoreListener());
 		this.view.addCheckoutListener(new CheckoutListener());
 		this.view.addLogoutListener(new LogoutListener());
+		this.view.addCartAddListener(new CartAddListener());
 	}
 	class LoginListener implements ActionListener{
 		public void actionPerformed(ActionEvent a) {
@@ -44,20 +45,26 @@ public class Controller {
 	
 	class StoreListener implements ActionListener{
 		public void actionPerformed(ActionEvent a) {
-			System.out.println("Store listener");
 			view.viewProducts(model.getProducts());
 		}
 	}
 	
 	class CheckoutListener implements ActionListener{
 		public void actionPerformed(ActionEvent a) {
-			System.out.println("Checkout listener");
+			view.viewCheckout(model.getAccountCart());
 		}
 	}
 	
 	class LogoutListener implements ActionListener{
 		public void actionPerformed(ActionEvent a) {
 			view.viewRegister();
+		}
+	}
+	
+	class CartAddListener implements ActionListener{
+		public void actionPerformed(ActionEvent a) {
+			System.out.println("added Item");
+			System.
 		}
 	}
 }

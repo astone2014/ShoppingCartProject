@@ -3,3 +3,4 @@
 /Controller$CheckoutListener.class
 /Controller$StoreListener.class
 /Controller$LogoutListener.class
+/Controller$CartAddListener.class
