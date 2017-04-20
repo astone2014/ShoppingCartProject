@@ -51,7 +51,7 @@ public class Model {
 			}
 			reader.close();
 			CSVWriter writer = new CSVWriter(new FileWriter(filepath, true));
-			String[] newAccount = { userName, stringPassword };
+			String[] newAccount = { userName, stringPassword, "1"};
 			writer.writeNext(newAccount);
 			writer.close();
 		} catch (IOException e) {
