@@ -5,6 +5,8 @@ import java.util.List;
 public class Controller {
 	private Model model;
 	private View view;
+	private LoginPanel login;
+	private StorePanel store;
 	/**
 	 * Controls user input and is the master of model and view
 	 * @param model the database
@@ -13,42 +15,46 @@ public class Controller {
 	public Controller(Model model, View view){
 		this.model = model;
 		this.view = view;
+		login = new LoginPanel();
+		view.addPanel(login.getPanel());
+		store = new StorePanel();
 		
-		this.view.addLoginListener(new LoginListener());
-		this.view.addRegisterListener(new RegisterListener());
-		this.view.addSignUpListener(new SignUpListener());
-		this.view.addStoreListener(new StoreListener());
-		this.view.addCheckoutListener(new CheckoutListener());
-		this.view.addLogoutListener(new LogoutListener());
-		List<String[]> products = model.getProducts();
-		for(String[] row : products){
-			this.view.addBuyNowListener(new BuyNowListener());
-		}
+		login.addLoginListener(new LoginListener());
+		login.addLogoutListener(new LogoutListener());
+		login.addRegisterListener(new RegisterListener());
+		login.addSignUpListener(new SignUpListener());
+		//store.addStoreListener(new StoreListener());
+		//checkout.addCheckoutListener(new CheckoutListener());
+		view.viewRefresh();
 	}
 	
 	class LoginListener implements ActionListener{
 		public void actionPerformed(ActionEvent a) {
-			if(model.loginUser(view.getUserName(), view.getUserPassword())){
-				view.viewLogedIn(model.getAccountType());
-				view.viewProducts(model.getProducts());
+			System.out.println("Clicked Login");
+			if(model.loginUser(login.getUserName(), login.getUserPassword())){
+				view.removePanel(login.getPanel());
+				view.addPanel(store.getPanel());
+				store.viewProducts(model.getProducts());
+				view.viewRefresh();
 			}else{
-				view.loginMessage("No account found. Please Try again.");
+				login.loginMessage("No account found. Please Try again.");
 			}
 		}
 	}
 	
 	class RegisterListener implements ActionListener{
 		public void actionPerformed(ActionEvent a) {
-			view.viewLoginPage();
+			System.out.println("Clicked Register");
+			login.viewLoginPage();
 		}
 	}
 	
 	class SignUpListener implements ActionListener{
 		public void actionPerformed(ActionEvent a) {
-			if(model.signUpUser(view.getUserName(), view.getUserPassword())){
-				view.loginMessage("Signup Successful");
+			if(model.signUpUser(login.getUserName(), login.getUserPassword())){
+				login.loginMessage("Signup Successful");
 			}else{
-				view.loginMessage("Please try different credentials");
+				login.loginMessage("Please try different credentials");
 			}
 		}
 	}
@@ -67,7 +73,7 @@ public class Controller {
 	
 	class LogoutListener implements ActionListener{
 		public void actionPerformed(ActionEvent a) {
-			view.viewLoginPage();
+			login.viewLoginPage();
 		}
 	}
 	
