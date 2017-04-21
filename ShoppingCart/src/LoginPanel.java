@@ -1,4 +1,5 @@
-import java.awt.Component;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
@@ -7,8 +8,9 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import java.awt.FlowLayout;
 
-public class LoginPanel extends JPanel{
+public class LoginPanel extends JPanel {
 	private JPanel login;
 	private JLabel lblUsername = new JLabel("Username:");
 	private JLabel lblPassword = new JLabel("Password:");
@@ -19,36 +21,130 @@ public class LoginPanel extends JPanel{
 	private JTextField userName = new JTextField(10);
 	private JPasswordField userPassword = new JPasswordField(10);
 	private final JLabel lblLogin = new JLabel("");
+	private final JPanel buttonPanel = new JPanel();
+	private final JPanel usernamePanel = new JPanel();
+	private final JPanel passwordPanel = new JPanel();
 
 	/**
 	 * Create the panel.
 	 */
 	public LoginPanel() {
 		login = new JPanel();
-		login.setLayout(null);
+		addLoginComponents();
+		login.setBackground(new Color(248, 247, 242));
+		
+		login.add(buttonPanel);
+		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		buttonPanel.add(btnLogin);
+		buttonPanel.add(btnRegister);
+	}
+
+	/**
+	 * Adds login components to the login panel
+	 */
+	private void addLoginComponents() {
+		createUserNameInput();
+		createPasswordInput();
+		createLoginMessageLabel();
+		createRegisterButton();
+	}
+	
+	public void viewRegistration(){
+		removeRegisterButton();
+		createSignUpButton();
+	}
+	
+	public void viewLogin(){
+		removeSignUpButton();
+		lblLogin.setText("");
+		createRegisterButton();
+	}
+
+	/**
+	 * Creates user input
+	 */
+	public void createUserNameInput() {
+		login.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		login.add(usernamePanel);
+		usernamePanel.add(lblUsername);
 		lblUsername.setHorizontalAlignment(SwingConstants.TRAILING);
-		lblUsername.setBounds(10, 85, 151, 14);
-		login.add(lblUsername);
-		userName.setBounds(171, 82, 90, 20);
-		login.add(userName);
+		usernamePanel.add(userName);
+	}
+
+	/**
+	 * Creates password input
+	 */
+	public void createPasswordInput() {
+		
+		login.add(passwordPanel);
+		passwordPanel.add(lblPassword);
 		lblPassword.setHorizontalAlignment(SwingConstants.TRAILING);
-		lblPassword.setBounds(10, 115, 149, 14);
-		login.add(lblPassword);
-		userPassword.setBounds(171, 112, 90, 20);
-		login.add(userPassword);
+		passwordPanel.add(userPassword);
+	}
+
+	/**
+	 * Creates login message label
+	 */
+	public void createLoginMessageLabel() {
 		lblLogin.setHorizontalAlignment(SwingConstants.CENTER);
-		lblLogin.setBounds(10, 42, 414, 14);
 		login.add(lblLogin);
-		btnRegister.setBounds(171, 174, 89, 23);
-		login.add(btnRegister);
-		btnLogin.setBounds(171, 143, 89, 23);
-		login.add(btnLogin);
+	}
+
+	/**
+	 * Creates a registration button
+	 */
+	public void createRegisterButton() {
+		buttonPanel.add(btnLogin);
+		buttonPanel.add(btnRegister);
 	}
 	
-	public JPanel getPanel(){
-		return login;		
+	public void removeRegisterButton() {
+		buttonPanel.remove(btnLogin);
+		buttonPanel.remove(btnRegister);
 	}
 	
+	public void createSignUpButton() {
+		buttonPanel.add(btnSignUp);
+		buttonPanel.add(btnLogin);
+	}
+	
+	public void removeSignUpButton() {
+		buttonPanel.remove(btnSignUp);
+		buttonPanel.remove(btnLogin);
+	}
+
+	/**
+	 * Returns the login panel
+	 *
+	 * @return login panel
+	 */
+	public JPanel getPanel() {
+		return login;
+	}
+
+	/**
+	 * Returns true is the login panel is displayed otherwise false
+	 * 
+	 * @return if login is displayed
+	 */
+	public boolean isLoginPanelDisplayed() {
+		if (login.getParent() == null)
+			return false;
+		else
+			return true;
+	}
+	
+	/**
+	 * false if the signup button is showing true if it is not showing
+	 * @return
+	 */
+	public boolean getLoginStatus() {
+		if (btnSignUp.getParent() == null)
+			return true;
+		else
+			return false;
+	}
 	/**
 	 * Displays the front end of the store or admin page depending on account
 	 * type
@@ -60,12 +156,6 @@ public class LoginPanel extends JPanel{
 		if (AccountType == 1) {
 		} else if (AccountType == 2) {
 		}
-	}
-
-	/**
-	 * Displays the login page or sign up page.
-	 */
-	void viewLoginPage() {
 	}
 
 	/**
@@ -94,15 +184,11 @@ public class LoginPanel extends JPanel{
 	 */
 	public void loginMessage(String string) {
 		lblLogin.setText(string);
-	}	
-
-	//Action Listeners
-	void addLoginListener(ActionListener listenerForLogin) {
-		btnLogin.addActionListener(listenerForLogin);
 	}
 
-	public void addLogoutListener(ActionListener listenerForLogout) {
-		btnLogout.addActionListener(listenerForLogout);
+	// Action Listeners
+	void addLoginListener(ActionListener listenerForLogin) {
+		btnLogin.addActionListener(listenerForLogin);
 	}
 
 	void addRegisterListener(ActionListener listenerForRegister) {
@@ -112,4 +198,5 @@ public class LoginPanel extends JPanel{
 	public void addSignUpListener(ActionListener listenerForSignUp) {
 		btnSignUp.addActionListener(listenerForSignUp);
 	}
+
 }
