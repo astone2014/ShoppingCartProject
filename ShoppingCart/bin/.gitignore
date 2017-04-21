@@ -1,5 +1,6 @@
 /Controller$BuyNowListener.class
 /Controller$CheckoutListener.class
+/Controller$IncrementListener.class
 /Controller$LoginListener.class
 /Controller$LogoutListener.class
 /Controller$RegisterListener.class
@@ -9,9 +10,9 @@
 /LoginPanel.class
 /MVCShoppingCart.class
 /Model.class
-/ProductPanel$1.class
 /ProductPanel.class
 /StorePanel.class
 /View.class
 /adminPanel.class
 /navPanel.class
+/Controller$DecrementListener.class
