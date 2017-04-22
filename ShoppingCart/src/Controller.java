@@ -75,21 +75,18 @@ public class Controller {
 
 	// <--------Navigation Listeners------->
 	class StoreListener implements ActionListener {
-		@Override
 		public void actionPerformed(ActionEvent a) {
 			displayStore();
 		}
 	}
 
 	class CheckoutListener implements ActionListener {
-		@Override
 		public void actionPerformed(ActionEvent a) {
 			displayCheckout();
 		}
 	}
 
 	class LogoutListener implements ActionListener {
-		@Override
 		public void actionPerformed(ActionEvent a) {
 			displayLogin();
 		}
@@ -108,7 +105,6 @@ public class Controller {
 			Price = price;
 		}
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			model.cartAdd(ID, Name, Type, Price);
 			store.viewProducts(model.getCSV("products.csv"),
@@ -136,7 +132,6 @@ public class Controller {
 			Price = price;
 		}
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			System.out.println("increment");
 			model.cartAdd(ID, Name, Type, Price);
