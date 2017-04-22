@@ -1,13 +1,11 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 public class Controller {
 	private Model model;
 	private View view;
 	private LoginPanel login;
 	private StorePanel store;
-	private List<ActionListener> buyNowActionListenerList;
 
 	/**
 	 * Controls user input and is the master of model and view
@@ -32,7 +30,6 @@ public class Controller {
 
 	// <----------Login Listeners---------->
 	class LoginListener implements ActionListener {
-		@Override
 		public void actionPerformed(ActionEvent a) {
 			if (login.getLoginStatus()) {
 				store.getNav().addStoreListener(new StoreListener());
@@ -40,11 +37,12 @@ public class Controller {
 				store.getNav().addLogoutListener(new LogoutListener());
 				if (model.loginUser(login.getUserName(), login.getUserPassword())) {
 					model.setAccountUsername(login.getUserName());
-					store.getNav().addWelcomeMessage(("Welcome " + model.getAccountUsername()).toString());
 					view.removePanel(login.getPanel());
 					view.addPanel(store.getPanel());
 					store.viewProducts(model.getCSV("products.csv"),
 							createBuyNowListeners(model.getCSV("products.csv").size()));
+					store.getNav().addWelcomeMessage(
+							("Welcome " + model.getAccountTypeString() + " " + model.getAccountUsername()));
 					view.viewRefresh();
 				} else {
 					login.loginMessage("No account found. Please Try again.");
@@ -84,6 +82,7 @@ public class Controller {
 	}
 
 	class CheckoutListener implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent a) {
 			displayCheckout();
 		}
@@ -97,51 +96,75 @@ public class Controller {
 	}
 
 	class BuyNowListener implements ActionListener {
+		private String ID;
 		private String Name;
-		private float Price;
+		private String Type;
+		private String Price;
 
-		public BuyNowListener(String name, String price) {
+		public BuyNowListener(String id, String name, String type, String price) {
+			ID = id;
 			Name = name;
-			Price = Float.parseFloat(price);
+			Type = type;
+			Price = price;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
-			model.cartAdd(Name, Price);
-			store.viewProducts(model.getCSV("products.csv"), createBuyNowListeners(model.getCSV("products.csv").size()));
+			model.cartAdd(ID, Name, Type, Price);
+			store.viewProducts(model.getCSV("products.csv"),
+					createBuyNowListeners(model.getCSV("products.csv").size()));
 			view.viewRefresh();
 		}
 	}
-	
+
 	class IncrementListener implements ActionListener {
+		private String ID;
 		private String Name;
-		private float Price;
-
-		public IncrementListener(String name, String price) {
+		private String Type;
+		private String Price;
+		/**
+		 * creates increment listener
+		 * @param name
+		 * @param price
+		 * @param id 
+		 * @param type 
+		 */
+		public IncrementListener(String id, String name, String type, String price) {
+			ID = id;
 			Name = name;
-			Price = Float.parseFloat(price);
+			Type = type;
+			Price = price;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			System.out.println("increment");
-			model.cartAdd(Name, Price);
-			store.viewCheckout(model.getCSV(model.getAccountCSVLocation()), createIncrementListeners(model.getCSV(model.getAccountCSVLocation()).size()), createDecrementListeners(model.getCSV(model.getAccountCSVLocation()).size()));
+			model.cartAdd(ID, Name, Type, Price);
+			store.viewCheckout(model.getCSV(model.getAccountCSVLocation()),
+					createIncrementListeners(model.getCSV(model.getAccountCSVLocation()).size()),
+					createDecrementListeners(model.getCSV(model.getAccountCSVLocation()).size()));
 			view.viewRefresh();
 		}
 	}
-	
-	class DecrementListener implements ActionListener {
-		private String Name;
-		private float Price;
 
-		public DecrementListener(String name, String price) {
+	class DecrementListener implements ActionListener {
+		private String ID;
+		private String Name;
+		private String Type;
+		private String Price;
+
+		public DecrementListener(String id, String name, String type, String price) {
+			ID = id;
 			Name = name;
-			Price = Float.parseFloat(price);
+			Type = type;
+			Price = price;
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			System.out.println("increment");
-			model.cartRemove(Name, Price);
-			store.viewCheckout(model.getCSV(model.getAccountCSVLocation()), createIncrementListeners(model.getCSV(model.getAccountCSVLocation()).size()), createDecrementListeners(model.getCSV(model.getAccountCSVLocation()).size()));
+			model.cartRemove(ID, Name, Type, Price);
+			store.viewCheckout(model.getCSV(model.getAccountCSVLocation()),
+					createIncrementListeners(model.getCSV(model.getAccountCSVLocation()).size()),
+					createDecrementListeners(model.getCSV(model.getAccountCSVLocation()).size()));
 			view.viewRefresh();
 		}
 	}
@@ -165,39 +188,55 @@ public class Controller {
 
 	/**
 	 * Creates button listeners.
-	 * 
+	 *
 	 * @param Amount
 	 *            how many listeners
 	 * @return An array of BuyNowListeners
 	 */
 	private BuyNowListener[] createBuyNowListeners(int amount) {
-		BuyNowListener[] buynowlistenerarray = new BuyNowListener[amount + 1];
+		BuyNowListener[] buynowlistenerarray = new BuyNowListener[amount];
 		if (model.getCSV("products.csv").isEmpty())
 			return null;
 		else {
 			int count = 0;
 			for (String[] product : model.getCSV("products.csv")) {
+				if(product[0].equals("ID")){
+					System.out.println("FIRST LINE");
+					continue;
+				}
 				++count;
-				buynowlistenerarray[count] = new BuyNowListener(product[0], product[1]);
+				String name = product[5];
+				String price = product[4];
+				String type = product[1];
+				String id = product[0];
+				buynowlistenerarray[count] = new BuyNowListener(id, name, type, price);
 			}
 			return buynowlistenerarray;
 		}
 	}
-	
+
 	private IncrementListener[] createIncrementListeners(int amount) {
-		IncrementListener[] incrementlistenerarray = new IncrementListener[amount + 1];
+		IncrementListener[] incrementlistenerarray = new IncrementListener[amount];
 		if (model.getCSV(model.getAccountCSVLocation()).isEmpty())
 			return null;
 		else {
 			int count = 0;
 			for (String[] product : model.getCSV(model.getAccountCSVLocation())) {
+				if(product[0].equals("ID")){
+					System.out.println("FIRST LINE");
+					continue;
+				}
+				String id = product[0];
+				String name = product[1];
+				String type = product[2];
+				String price = product[3];
+				incrementlistenerarray[count] = new IncrementListener(id, name, type, price);
 				++count;
-				incrementlistenerarray[count] = new IncrementListener(product[0], product[1]);
 			}
 			return incrementlistenerarray;
 		}
 	}
-	
+
 	private DecrementListener[] createDecrementListeners(int amount) {
 		DecrementListener[] decrementlistenerarray = new DecrementListener[amount + 1];
 		if (model.getCSV(model.getAccountCSVLocation()).isEmpty())
@@ -205,8 +244,16 @@ public class Controller {
 		else {
 			int count = 0;
 			for (String[] product : model.getCSV(model.getAccountCSVLocation())) {
+				if(product[0].equals("ID")){
+					System.out.println("FIRST LINE");
+					continue;
+				}
+				String id = product[0];
+				String name = product[1];
+				String type = product[2];
+				String price = product[3];
+				decrementlistenerarray[count] = new DecrementListener(id, name, type, price);
 				++count;
-				decrementlistenerarray[count] = new DecrementListener(product[0], product[1]);
 			}
 			return decrementlistenerarray;
 		}
@@ -216,11 +263,11 @@ public class Controller {
 	 * Displays the checkout
 	 */
 	public void displayCheckout() {
-		System.out.println(store.getCurrentView());
 		if (store.getCurrentView().equals("Store")) {
-			System.out.println("Checkout Display");
 			store.removeProductsFromDisplay();
-			store.viewCheckout(model.getAccountCart(), createIncrementListeners(model.getCSV(model.getAccountCSVLocation()).size()), createDecrementListeners(model.getCSV(model.getAccountCSVLocation()).size()));
+			store.viewCheckout(model.getAccountCart(),
+					createIncrementListeners(model.getCSV(model.getAccountCSVLocation()).size()),
+					createDecrementListeners(model.getCSV(model.getAccountCSVLocation()).size()));
 			view.viewRefresh();
 		} else {
 			System.out.println("You're already on the checkout page.");

@@ -1,12 +1,13 @@
 import javax.swing.JPanel;
 
-public class adminPanel extends JPanel {
+public class AdminPanel extends JPanel {
 
 	private JPanel admin;
+
 	/**
 	 * Create the panel.
 	 */
-	public adminPanel() {
+	public AdminPanel() {
 		admin = new JPanel();
 		admin.setLayout(null);
 	}

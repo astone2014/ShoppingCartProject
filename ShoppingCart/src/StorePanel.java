@@ -9,7 +9,7 @@ import javax.swing.border.EmptyBorder;
 public class StorePanel extends JPanel {
 	private JPanel store;
 	private JPanel productsPanel;
-	private navPanel navPanel;
+	private NavPanel NavPanel;
 	private int storeStatus = 0;
 
 	/**
@@ -32,9 +32,13 @@ public class StorePanel extends JPanel {
 		int x = 0;
 		removeProductsFromDisplay();
 		for (String[] product : products) {
+			if(product[0].equals("ID")){
+				System.out.println("FIRST LINE");
+				continue;
+			}
 			++x;
 			ProductPanel newproduct = new ProductPanel(product[0], product[1], product[2], product[3],
-					buyNowListener[x]);
+					product[4], product[5], product[6], buyNowListener[x]);
 			productsPanel.add(newproduct.getPanel());
 		}
 		store.add(productsPanel, BorderLayout.CENTER);
@@ -42,19 +46,27 @@ public class StorePanel extends JPanel {
 	}
 
 	/**
-	 * Displays checkout page
-	 *
+	 * Displays the checkout page.
+	 * 
 	 * @param accountCart
-	 *            List<String[]> from model
+	 *            The cart of the account from the model(database)
+	 * @param incrementListener
+	 *            adds item to cart and removes item from stock
+	 * @param decrementListener
+	 *            removes item from cart and adds item to stock
 	 */
 	public void viewCheckout(List<String[]> accountCart, Controller.IncrementListener[] incrementListener,
-		Controller.DecrementListener[] decrementListener) {
+			Controller.DecrementListener[] decrementListener) {
 		removeProductsFromDisplay();
 		int x = 0;
 		for (String[] product : accountCart) {
+			if(product[0].equals("ID")){
+				System.out.println("FIRST LINE");
+				continue;
+			}
+			ProductPanel newproduct = new ProductPanel(product[0], product[1], product[2], product[3], product[4], 
+					incrementListener[x], decrementListener[x]);
 			++x;
-			ProductPanel newproduct = new ProductPanel(product[0], product[1], product[2], incrementListener[x],
-					decrementListener[x]);
 			productsPanel.add(newproduct.getPanel());
 		}
 		store.add(productsPanel, BorderLayout.CENTER);
@@ -107,8 +119,8 @@ public class StorePanel extends JPanel {
 	 *
 	 * @return nav JPanel
 	 */
-	public navPanel getNav() {
-		return navPanel;
+	public NavPanel getNav() {
+		return NavPanel;
 	}
 
 	/**
@@ -134,10 +146,10 @@ public class StorePanel extends JPanel {
 	 * Creates the navigation panel
 	 */
 	private void createNavigationPanel() {
-		navPanel = new navPanel();
-		navPanel.setLayout(new FlowLayout(0, 10, 10));
-		navPanel.setBackground(new Color(0, 0, 0));
-		store.add(navPanel.getPanel(), BorderLayout.NORTH);
+		NavPanel = new NavPanel();
+		NavPanel.setLayout(new FlowLayout(0, 10, 10));
+		NavPanel.setBackground(new Color(0, 0, 0));
+		store.add(NavPanel.getPanel(), BorderLayout.NORTH);
 	}
 
 	/**

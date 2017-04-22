@@ -13,15 +13,21 @@ import javax.swing.border.EmptyBorder;
 public class ProductPanel extends JPanel {
 	private JPanel product;
 	private String Name;
-	private float Price;
-	private int Count;
 	private String Description;
+	private String ID;
+	private String Type;
+	int Quantity;
+	float Invoiceprice;
+	float Sellingprice;
 	private JButton buynow;
 	private JButton increment;
 	private JButton decrement;
-
+	private Controller.IncrementListener IncrementListener;
+	private Controller.DecrementListener DecrementListener;
+	private Controller.BuyNowListener BuyNowListener;
 	/**
 	 * Creates product panel for shopping cart
+	 * @param name 
 	 *
 	 * @param name
 	 *            Name of product
@@ -34,33 +40,19 @@ public class ProductPanel extends JPanel {
 	 * @wbp.parser.constructor
 	 *
 	 */
-	public ProductPanel(String name, String price, String count, String description, ActionListener buynowbutton) {
+	public ProductPanel(String id, String type, String quantity, String invoiceprice, String sellingprice, String name, String description, 
+			Controller.BuyNowListener buyNowListener) {
 		Name = name;
-		Price = Float.parseFloat(price);
-		Count = Integer.parseInt(count);
 		Description = description;
-
-		product = new JPanel(new BorderLayout());
-		product.setName(Name);
-		product.setBackground(new Color(235, 232, 217));
-		product.setBorder(new EmptyBorder(10, 5, 10, 5));
-
-		product.add(prodImage("C:\\Users\\auste\\Downloads\\product.png"), BorderLayout.WEST);
-		product.add(new JLabel(Name), BorderLayout.NORTH);
-		
-		JPanel store = new JPanel(new BorderLayout());
-		JPanel checkoutInfo = new JPanel(new FlowLayout());
-		JPanel prodDesc = new JPanel(new FlowLayout());
-		store.add(buyNowButton(buynowbutton), BorderLayout.SOUTH);
-		checkoutInfo.add(new JLabel("Stock: " + Count));
-		checkoutInfo.add(new JLabel("$" + Price));
-		prodDesc.add(prodDescription(description));
-		store.add(checkoutInfo, BorderLayout.NORTH);
-		store.add(prodDesc, BorderLayout.CENTER);
-		store.setBackground(new Color(235, 232, 217));
-		product.add(store, BorderLayout.EAST);
-
+		ID = String.valueOf(id);
+		Type = type;
+		Quantity = Integer.parseInt(quantity);
+		Invoiceprice = Float.parseFloat(invoiceprice);
+		Sellingprice = Float.parseFloat(sellingprice);
+		BuyNowListener = buyNowListener;
+		createStoreItem();
 	}
+	
 
 	/**
 	 * Creates product panel checkout
@@ -72,32 +64,17 @@ public class ProductPanel extends JPanel {
 	 * @param count
 	 *            How many of the product is in stock
 	 */
-	public ProductPanel(String name, String price, String count, ActionListener incrementListener,
-			ActionListener decrementListenerr) {
+	public ProductPanel(String id, String name, String type, String sellingprice, String quantity,
+			Controller.IncrementListener incrementListener, Controller.DecrementListener decrementListener) {
 		Name = name;
-		Price = Float.parseFloat(price);
-		Count = Integer.parseInt(count);
+		ID = String.valueOf(id);
+		Type = type;
+		Quantity = Integer.parseInt(quantity);
+		Sellingprice = Float.parseFloat(sellingprice);
+		IncrementListener = incrementListener;
+		DecrementListener = decrementListener;
 
-		product = new JPanel(new BorderLayout());
-		product.setName(Name);
-		product.setBackground(new Color(235, 232, 217));
-		product.setBorder(new EmptyBorder(10, 5, 10, 5));
-
-		product.add(prodImage("C:\\Users\\auste\\Downloads\\product.png"), BorderLayout.WEST);
-		product.add(new JLabel(Name), BorderLayout.NORTH);
-
-		JPanel checkout = new JPanel(new BorderLayout());
-		JPanel checkoutButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		JPanel checkoutInfo = new JPanel(new FlowLayout());
-		checkoutInfo.add(new JLabel("$" + Price));
-		checkoutInfo.add(new JLabel("Amount: " + Count));
-		checkoutButtons.add(incrementCartButton(incrementListener));
-		checkoutButtons.add(decrementCartButton(decrementListenerr));
-		checkout.add(checkoutInfo, BorderLayout.NORTH);
-		checkout.add(checkoutButtons, BorderLayout.SOUTH);
-		product.setBackground(new Color(235, 232, 217));
-		product.add(checkout, BorderLayout.EAST);
-
+		createCheckoutComponents();
 	}
 
 	public JPanel getPanel() {
@@ -115,6 +92,54 @@ public class ProductPanel extends JPanel {
 		return prodDescription;
 	}
 
+	private void createCheckoutComponents() {	
+		product = new JPanel(new BorderLayout());
+		product.setName(Name);
+		product.setBackground(new Color(235, 232, 217));
+		product.setBorder(new EmptyBorder(10, 5, 10, 5));
+	
+		product.add(prodImage("C:\\Users\\auste\\Downloads\\product.png"), BorderLayout.WEST);
+		product.add(new JLabel(Name), BorderLayout.NORTH);
+	
+		JPanel checkout = new JPanel(new BorderLayout());
+		JPanel checkoutButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		JPanel checkoutInfo = new JPanel(new FlowLayout());
+		checkoutInfo.add(new JLabel("$" + Sellingprice));
+		checkoutInfo.add(new JLabel("Amount: " + Quantity));
+		checkoutButtons.add(incrementCartButton(IncrementListener));
+		checkoutButtons.add(decrementCartButton(DecrementListener));
+		checkout.add(checkoutInfo, BorderLayout.NORTH);
+		checkout.add(checkoutButtons, BorderLayout.SOUTH);
+		product.setBackground(new Color(235, 232, 217));
+		product.add(checkout, BorderLayout.EAST);
+	}
+	
+	private void createStoreItem() {		
+		product = new JPanel(new BorderLayout());
+		product.setName(Name);
+		product.setBackground(new Color(235, 232, 217));
+		product.setBorder(new EmptyBorder(10, 5, 10, 5));
+	
+		product.add(prodImage("C:\\Users\\auste\\Downloads\\product.png"), BorderLayout.WEST);
+		product.add(new JLabel(Name), BorderLayout.NORTH);
+		
+		JPanel store = new JPanel(new BorderLayout());
+		JPanel checkoutInfo = new JPanel(new FlowLayout());
+		JPanel prodDesc = new JPanel(new FlowLayout());
+		store.add(buyNowButton(BuyNowListener), BorderLayout.SOUTH);
+		if(Quantity == 0){
+			checkoutInfo.add(new JLabel("OUT OF STOCK"));
+		}else{
+			checkoutInfo.add(new JLabel("Stock: " + Quantity));
+			checkoutInfo.add(new JLabel("$" + Sellingprice));
+		}
+		prodDesc.add(prodDescription(Description));
+		store.add(checkoutInfo, BorderLayout.NORTH);
+		store.add(prodDesc, BorderLayout.CENTER);
+		store.setBackground(new Color(235, 232, 217));
+		product.add(store, BorderLayout.EAST);	
+	}
+	
 	public void addBuyNowListener(ActionListener listenerforBuyNow) {
 		buynow.addActionListener(listenerforBuyNow);
 	}
@@ -136,8 +161,8 @@ public class ProductPanel extends JPanel {
 	}
 	
 	public JButton decrementCartButton(ActionListener decrementButton) {
-		increment = new JButton("v");
-		increment.addActionListener(decrementButton);
-		return increment;
+		decrement = new JButton("v");
+		decrement.addActionListener(decrementButton);
+		return decrement;
 	}
 }

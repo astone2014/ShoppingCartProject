@@ -1,5 +1,5 @@
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
@@ -8,14 +8,12 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import java.awt.FlowLayout;
 
 public class LoginPanel extends JPanel {
 	private JPanel login;
 	private JLabel lblUsername = new JLabel("Username:");
 	private JLabel lblPassword = new JLabel("Password:");
 	private final JButton btnLogin = new JButton("Login");
-	private final JButton btnLogout = new JButton("Logout");
 	private final JButton btnRegister = new JButton("Register");
 	private final JButton btnSignUp = new JButton("Sign Up");
 	private JTextField userName = new JTextField(10);
@@ -32,7 +30,7 @@ public class LoginPanel extends JPanel {
 		login = new JPanel();
 		addLoginComponents();
 		login.setBackground(new Color(248, 247, 242));
-		
+
 		login.add(buttonPanel);
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		buttonPanel.add(btnLogin);
@@ -48,13 +46,13 @@ public class LoginPanel extends JPanel {
 		createLoginMessageLabel();
 		createRegisterButton();
 	}
-	
-	public void viewRegistration(){
+
+	public void viewRegistration() {
 		removeRegisterButton();
 		createSignUpButton();
 	}
-	
-	public void viewLogin(){
+
+	public void viewLogin() {
 		removeSignUpButton();
 		lblLogin.setText("");
 		createRegisterButton();
@@ -65,7 +63,7 @@ public class LoginPanel extends JPanel {
 	 */
 	public void createUserNameInput() {
 		login.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		
+
 		login.add(usernamePanel);
 		usernamePanel.add(lblUsername);
 		lblUsername.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -76,7 +74,7 @@ public class LoginPanel extends JPanel {
 	 * Creates password input
 	 */
 	public void createPasswordInput() {
-		
+
 		login.add(passwordPanel);
 		passwordPanel.add(lblPassword);
 		lblPassword.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -98,17 +96,17 @@ public class LoginPanel extends JPanel {
 		buttonPanel.add(btnLogin);
 		buttonPanel.add(btnRegister);
 	}
-	
+
 	public void removeRegisterButton() {
 		buttonPanel.remove(btnLogin);
 		buttonPanel.remove(btnRegister);
 	}
-	
+
 	public void createSignUpButton() {
 		buttonPanel.add(btnSignUp);
 		buttonPanel.add(btnLogin);
 	}
-	
+
 	public void removeSignUpButton() {
 		buttonPanel.remove(btnSignUp);
 		buttonPanel.remove(btnLogin);
@@ -125,7 +123,7 @@ public class LoginPanel extends JPanel {
 
 	/**
 	 * Returns true is the login panel is displayed otherwise false
-	 * 
+	 *
 	 * @return if login is displayed
 	 */
 	public boolean isLoginPanelDisplayed() {
@@ -134,9 +132,10 @@ public class LoginPanel extends JPanel {
 		else
 			return true;
 	}
-	
+
 	/**
 	 * false if the signup button is showing true if it is not showing
+	 * 
 	 * @return
 	 */
 	public boolean getLoginStatus() {
@@ -145,6 +144,7 @@ public class LoginPanel extends JPanel {
 		else
 			return false;
 	}
+
 	/**
 	 * Displays the front end of the store or admin page depending on account
 	 * type
