@@ -28,6 +28,9 @@ public class Model {
 		boolean replace = true;
 		List<String[]> allLines = getCSV(CSVLocation);
 		String[] newCartItem = {"","","","",""};
+		if(getStock(name) == 0){
+			return;
+		}
 		try {
 			for (String[] product : allLines) {
 				String cartName = product[1];
@@ -52,7 +55,6 @@ public class Model {
 			newCartItem[2] = type;
 			newCartItem[3] = price;
 			newCartItem[4] = String.valueOf(1);
-			
 			try {
 				allLines.add(newCartItem);
 			} catch (NullPointerException n) {
@@ -66,9 +68,7 @@ public class Model {
 
 	public void cartRemove(String id, String name, String type, String price) {
 		String filepath = CSVLocation;
-		boolean replace = true;
 		List<String[]> allLines = getCSV(filepath);
-		String[] newCartItem = {"","","","",""};
 		int x = 0;
 		try {
 			try {
@@ -82,11 +82,11 @@ public class Model {
 							cartQuantity = String.valueOf(Integer.parseInt(cartQuantity) - 1);
 							System.out.println(" -> " + cartQuantity);
 						} else if (Integer.parseInt(cartQuantity) == 0) {
-							System.out.println("REMOVED FROM CART");
 							allLines.remove(x);
+							writeCSV(allLines, filepath, false);
+							return;
 						}
 						product[4] = cartQuantity;
-						replace = false;
 					}
 					x++;
 				}
@@ -95,24 +95,12 @@ public class Model {
 		} catch (NullPointerException n) {
 			createAccountCSV(CSVLocation);
 		}
-		if (replace) {
-			System.out.println("Added NEW Item: " + name + " - Price: " + price);
-			newCartItem[0] = String.valueOf(x);
-			newCartItem[1] = name;
-			newCartItem[2] = "new type";
-			newCartItem[3] = price;
-			newCartItem[4] = String.valueOf(1);
-			try {
-				allLines.add(newCartItem);
-			} catch (NullPointerException n) {
-				System.out.println("no cart items");
-			}
-		}
+		incrementStock(name);
 		writeCSV(allLines, filepath, false);
 		return;
 	}
 
-	private void decrementStock(String name) {
+	void decrementStock(String name) {
 		List<String[]> inventory = getCSV("products.csv");
 		for (String[] product : inventory) {
 			if (product[5].equals(name)) {
@@ -128,7 +116,7 @@ public class Model {
 		writeCSV(inventory, "products.csv", false);
 	}
 
-	private void incrementStock(String productName) {
+	void incrementStock(String productName) {
 		List<String[]> inventory = getCSV("products.csv");
 		for (String[] product : inventory) {
 			if (product[5].equals(productName)) {
@@ -186,7 +174,7 @@ public class Model {
 		try {
 			CSVReader reader = new CSVReader(new FileReader("products.csv"));
 			List<String[]> readerToReturn = reader.readAll();
-			for(String[] count : readerToReturn){
+			for(@SuppressWarnings("unused") String[] count : readerToReturn){
 				++newindex;
 			}
 			reader.close();
@@ -313,7 +301,6 @@ public class Model {
 					if (stringPassword.equals(nextUser[1])) {
 						AccountType = Integer.parseUnsignedInt(nextUser[2]);
 						setAccountUsername(userName);
-						System.out.println("Welcome " + userName);
 						reader.close();
 						return true;
 					}
@@ -364,6 +351,30 @@ public class Model {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * returns the stock for a product otherwise it returns null.
+	 * @param name
+	 * @return
+	 */
+	public int getStock(String name) {
+		List<String[]> inventory = getCSV("products.csv");
+		for(String[] product : inventory){
+			if(product[5].equals(name)){
+				return Integer.parseInt(product[2]);
+			}
+		}
+		return 0;
+	}
+	
+	public float getCartTotal() {
+		float total = 0;
+		List<String[]> inventory = getCSV(CSVLocation);
+		for(String[] product : inventory){
+			total += Float.parseFloat(product[3]) * Integer.parseInt(product[4]);
+		}
+		return total;
 	}
 
 }

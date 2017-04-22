@@ -20,7 +20,6 @@ public class Controller {
 		this.view = view;
 		login = new LoginPanel();
 		view.addPanel(login.getPanel());
-		store = new StorePanel();
 
 		login.addLoginListener(new LoginListener());
 		login.addRegisterListener(new RegisterListener());
@@ -32,18 +31,28 @@ public class Controller {
 	class LoginListener implements ActionListener {
 		public void actionPerformed(ActionEvent a) {
 			if (login.getLoginStatus()) {
-				store.getNav().addStoreListener(new StoreListener());
-				store.getNav().addCheckoutListener(new CheckoutListener());
-				store.getNav().addLogoutListener(new LogoutListener());
 				if (model.loginUser(login.getUserName(), login.getUserPassword())) {
+					store = new StorePanel(model.getAccountTypeString());
+					store.getNav().addStoreListener(new StoreListener());
+					store.getNav().addCartListener(new CartListener());
+					store.getNav().addLogoutListener(new LogoutListener());
+					store.getFooter().addCheckoutListener(new CheckoutListener());
 					model.setAccountUsername(login.getUserName());
 					view.removePanel(login.getPanel());
 					view.addPanel(store.getPanel());
-					store.viewProducts(model.getCSV("products.csv"),
-							createBuyNowListeners(model.getCSV("products.csv").size()));
-					store.getNav().addWelcomeMessage(
-							("Welcome " + model.getAccountTypeString() + " " + model.getAccountUsername()));
-					view.viewRefresh();
+					if(model.getAccountTypeString().equals("Admin")){
+						store.getNav().addAdminListener(new AdminListener());
+						store.viewAdmin(model.getCSV("products.csv"), createStockIncrementListeners(model.getCSV("products.csv").size()), createStockDecrementListeners(model.getCSV("products.csv").size()));
+						store.getNav().addWelcomeMessage(("Welcome " + model.getAccountTypeString() + " " + model.getAccountUsername()));
+						store.getFooter().setTotalText(model.getCartTotal());
+						view.viewRefresh();
+					}else{
+						store.viewProducts(model.getCSV("products.csv"),
+								createBuyNowListeners(model.getCSV("products.csv").size()));
+						store.getNav().addWelcomeMessage(
+								("Welcome " + model.getAccountTypeString() + " " + model.getAccountUsername()));
+						view.viewRefresh();
+					}
 				} else {
 					login.loginMessage("No account found. Please Try again.");
 				}
@@ -56,14 +65,12 @@ public class Controller {
 
 	// <--------Login Page Listeners------->
 	class RegisterListener implements ActionListener {
-		@Override
 		public void actionPerformed(ActionEvent a) {
 			displayRegistration();
 		}
 	}
 
 	class SignUpListener implements ActionListener {
-		@Override
 		public void actionPerformed(ActionEvent a) {
 			if (model.signUpUser(login.getUserName(), login.getUserPassword())) {
 				login.loginMessage("Signup Successful");
@@ -79,10 +86,22 @@ public class Controller {
 			displayStore();
 		}
 	}
-
-	class CheckoutListener implements ActionListener {
+	
+	class AdminListener implements ActionListener {
 		public void actionPerformed(ActionEvent a) {
-			displayCheckout();
+			displayAdmin();
+		}
+	}
+	
+	class FinanceListener implements ActionListener {
+		public void actionPerformed(ActionEvent a) {
+			displayAdmin();
+		}
+	}
+
+	class CartListener implements ActionListener {
+		public void actionPerformed(ActionEvent a) {
+			displayCart();
 		}
 	}
 
@@ -106,18 +125,19 @@ public class Controller {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			model.cartAdd(ID, Name, Type, Price);
-			store.viewProducts(model.getCSV("products.csv"),
-					createBuyNowListeners(model.getCSV("products.csv").size()));
-			view.viewRefresh();
+			if(model.getStock(Name) == 0){
+			}else{
+				model.cartAdd(ID, Name, Type, Price);
+				store.viewProducts(model.getCSV("products.csv"),
+				createBuyNowListeners(model.getCSV("products.csv").size()));
+				FooterPanel.setTotalText(model.getCartTotal());
+				view.viewRefresh();
+			}
 		}
 	}
 
 	class IncrementListener implements ActionListener {
-		private String ID;
 		private String Name;
-		private String Type;
-		private String Price;
 		/**
 		 * creates increment listener
 		 * @param name
@@ -126,18 +146,15 @@ public class Controller {
 		 * @param type 
 		 */
 		public IncrementListener(String id, String name, String type, String price) {
-			ID = id;
 			Name = name;
-			Type = type;
-			Price = price;
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			System.out.println("increment");
-			model.cartAdd(ID, Name, Type, Price);
-			store.viewCheckout(model.getCSV(model.getAccountCSVLocation()),
-					createIncrementListeners(model.getCSV(model.getAccountCSVLocation()).size()),
-					createDecrementListeners(model.getCSV(model.getAccountCSVLocation()).size()));
+			model.incrementStock(Name);
+			store.viewAdmin(model.getCSV("products.csv"),
+					createStockIncrementListeners(model.getCSV("products.csv").size()),
+					createStockDecrementListeners(model.getCSV("products.csv").size()));
+			FooterPanel.setTotalText(model.getCartTotal());
 			view.viewRefresh();
 		}
 	}
@@ -157,30 +174,62 @@ public class Controller {
 
 		public void actionPerformed(ActionEvent e) {
 			model.cartRemove(ID, Name, Type, Price);
-			store.viewCheckout(model.getCSV(model.getAccountCSVLocation()),
+			store.viewCart(model.getCSV(model.getAccountCSVLocation()),
 					createIncrementListeners(model.getCSV(model.getAccountCSVLocation()).size()),
 					createDecrementListeners(model.getCSV(model.getAccountCSVLocation()).size()));
+			FooterPanel.setTotalText(model.getCartTotal());
 			view.viewRefresh();
 		}
 	}
 
-	// <----------Helper Functions---------->
-	/**
-	 * Displays the store if it's not already displayed.
-	 */
-	public void displayStore() {
-		System.out.println(store.getCurrentView());
-		if (store.getCurrentView().equals("Checkout")) {
-			System.out.println("Store Display");
-			store.removeProductsFromDisplay();
-			store.viewProducts(model.getCSV("products.csv"),
-					createBuyNowListeners(model.getCSV("products.csv").size()));
+	class StockIncrementListener implements ActionListener {
+		private String Name;
+		/**
+		 * creates increment listener
+		 * @param name
+		 * @param price
+		 * @param id 
+		 * @param type 
+		 */
+		public StockIncrementListener(String id, String name, String type, String price) {
+			Name = name;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			model.incrementStock(Name);
+			store.viewAdmin(model.getCSV("products.csv"),
+					createStockIncrementListeners(model.getCSV("products.csv").size()),
+					createStockDecrementListeners(model.getCSV("products.csv").size()));
+			FooterPanel.setTotalText(model.getCartTotal());
 			view.viewRefresh();
-		} else {
-			System.out.println("You're already on the store page.");
 		}
 	}
 
+	class StockDecrementListener implements ActionListener {
+		private String Name;
+		public StockDecrementListener(String id, String name, String type, String price) {
+			Name = name;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			model.decrementStock(Name);
+			store.viewAdmin(model.getCSV("products.csv"),
+					createStockIncrementListeners(model.getCSV("products.csv").size()),
+					createStockDecrementListeners(model.getCSV("products.csv").size()));
+			FooterPanel.setTotalText(model.getCartTotal());
+			view.viewRefresh();
+		}
+	}
+	
+	// <--------Footer Listeners------->
+	class CheckoutListener implements ActionListener {
+		public void actionPerformed(ActionEvent a) {
+			displayCheckout();
+			model.getCartTotal();
+		}
+	}
+	
+	// <------Create Listener Arrays------>
 	/**
 	 * Creates button listeners.
 	 *
@@ -196,7 +245,6 @@ public class Controller {
 			int count = 0;
 			for (String[] product : model.getCSV("products.csv")) {
 				if(product[0].equals("ID")){
-					System.out.println("FIRST LINE");
 					continue;
 				}
 				++count;
@@ -218,7 +266,6 @@ public class Controller {
 			int count = 0;
 			for (String[] product : model.getCSV(model.getAccountCSVLocation())) {
 				if(product[0].equals("ID")){
-					System.out.println("FIRST LINE");
 					continue;
 				}
 				String id = product[0];
@@ -233,14 +280,13 @@ public class Controller {
 	}
 
 	private DecrementListener[] createDecrementListeners(int amount) {
-		DecrementListener[] decrementlistenerarray = new DecrementListener[amount + 1];
+		DecrementListener[] decrementlistenerarray = new DecrementListener[amount];
 		if (model.getCSV(model.getAccountCSVLocation()).isEmpty())
 			return null;
 		else {
 			int count = 0;
 			for (String[] product : model.getCSV(model.getAccountCSVLocation())) {
 				if(product[0].equals("ID")){
-					System.out.println("FIRST LINE");
 					continue;
 				}
 				String id = product[0];
@@ -253,19 +299,121 @@ public class Controller {
 			return decrementlistenerarray;
 		}
 	}
+	
+	private StockIncrementListener[] createStockIncrementListeners(int amount) {
+		StockIncrementListener[] stockincrementlistenerarray = new StockIncrementListener[amount];
+		if (model.getCSV("products.csv").isEmpty())
+			return null;
+		else {
+			int count = 0;
+			for (String[] product : model.getCSV("products.csv")) {
+				if(product[0].equals("ID")){
+					continue;
+				}
+				String name = product[5];
+				String price = product[4];
+				String type = product[1];
+				String id = product[0];
+				stockincrementlistenerarray[count] = new StockIncrementListener(id, name, type, price);
+				++count;
+			}
+			return stockincrementlistenerarray;
+		}
+	}
 
+	private StockDecrementListener[] createStockDecrementListeners(int amount) {
+		StockDecrementListener[] stockdecrementlistenerarray = new StockDecrementListener[amount + 1];
+		if (model.getCSV("products.csv").isEmpty())
+			return null;
+		else {
+			int count = 0;
+			for (String[] product : model.getCSV("products.csv")) {
+				if(product[0].equals("ID")){
+					continue;
+				}
+				String name = product[5];
+				String price = product[4];
+				String type = product[1];
+				String id = product[0];
+				stockdecrementlistenerarray[count] = new StockDecrementListener(id, name, type, price);
+				++count;
+			}
+			return stockdecrementlistenerarray;
+		}
+	}
+	
+	// <----------Helper Functions---------->
+	/**
+	 * Displays the store if it's not already displayed.
+	 */
+	public void displayStore() {
+		FooterPanel.setTotalText(model.getCartTotal());
+		if (store.getCurrentView().equals("Store")) {
+			System.out.println("You're already on the store page.");
+		} else {
+			store.removeProductsFromDisplay();
+			store.viewProducts(model.getCSV("products.csv"),
+					createBuyNowListeners(model.getCSV("products.csv").size()));
+			view.viewRefresh();
+		}
+	}
+	
+	/**
+	 * Displays the cart
+	 */
+	public void displayCart() {
+		if (store.getCurrentView().equals("Cart")) {
+			System.out.println("You're already on the cart page.");
+		} else {
+			view.addPanel(store.getPanel());
+			store.removeProductsFromDisplay();
+			store.viewCart(model.getAccountCart(),
+					createIncrementListeners(model.getCSV(model.getAccountCSVLocation()).size()),
+					createDecrementListeners(model.getCSV(model.getAccountCSVLocation()).size()));
+			view.viewRefresh();
+		}
+	}
+	
+	/**
+	 * Displays the admin page
+	 */
+	public void displayAdmin() {
+		if (store.getCurrentView().equals("Admin")) {
+			System.out.println("You're already on the admin page.");
+		} else {
+			view.addPanel(store.getPanel());
+			store.removeProductsFromDisplay();
+			store.viewAdmin(model.getCSV("products.csv"),
+					createStockIncrementListeners(model.getCSV("products.csv").size()),
+					createStockDecrementListeners(model.getCSV("products.csv").size()));
+			view.viewRefresh();
+		}
+	}
+	
+	/**
+	 * Displays the finance page
+	 */
+	public void displayFinance() {
+		if (store.getCurrentView().equals("Finance")) {
+			System.out.println("You're already on the finance page.");
+		} else {
+			view.addPanel(store.getPanel());
+			store.removeProductsFromDisplay();
+			store.viewFinance(model.getCSV("sales.csv"));
+			view.viewRefresh();
+		}
+	}
+	
 	/**
 	 * Displays the checkout
 	 */
 	public void displayCheckout() {
-		if (store.getCurrentView().equals("Store")) {
-			store.removeProductsFromDisplay();
-			store.viewCheckout(model.getAccountCart(),
-					createIncrementListeners(model.getCSV(model.getAccountCSVLocation()).size()),
-					createDecrementListeners(model.getCSV(model.getAccountCSVLocation()).size()));
-			view.viewRefresh();
-		} else {
+		if (store.getCurrentView().equals("Checkout")) {
 			System.out.println("You're already on the checkout page.");
+		} else {
+			store.removeProductsFromDisplay();
+			store.viewCheckout(model.getCartTotal());
+			view.viewRefresh();
 		}
 	}
 

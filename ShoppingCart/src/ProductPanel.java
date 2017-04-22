@@ -1,6 +1,5 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 
@@ -14,16 +13,18 @@ public class ProductPanel extends JPanel {
 	private JPanel product;
 	private String Name;
 	private String Description;
-	private String ID;
-	private String Type;
 	int Quantity;
 	float Invoiceprice;
 	float Sellingprice;
 	private JButton buynow;
 	private JButton increment;
 	private JButton decrement;
+	private JButton stockincrement;
+	private JButton stockdecrement;
 	private Controller.IncrementListener IncrementListener;
 	private Controller.DecrementListener DecrementListener;
+	private Controller.StockIncrementListener StockIncrementListener;
+	private Controller.StockDecrementListener StockDecrementListener;
 	private Controller.BuyNowListener BuyNowListener;
 	/**
 	 * Creates product panel for shopping cart
@@ -37,15 +38,13 @@ public class ProductPanel extends JPanel {
 	 *            How many of the product is in stock
 	 * @param description
 	 *            Description of product
-	 * @wbp.parser.constructor
 	 *
 	 */
 	public ProductPanel(String id, String type, String quantity, String invoiceprice, String sellingprice, String name, String description, 
 			Controller.BuyNowListener buyNowListener) {
 		Name = name;
 		Description = description;
-		ID = String.valueOf(id);
-		Type = type;
+		String.valueOf(id);
 		Quantity = Integer.parseInt(quantity);
 		Invoiceprice = Float.parseFloat(invoiceprice);
 		Sellingprice = Float.parseFloat(sellingprice);
@@ -53,7 +52,6 @@ public class ProductPanel extends JPanel {
 		createStoreItem();
 	}
 	
-
 	/**
 	 * Creates product panel checkout
 	 *
@@ -67,14 +65,35 @@ public class ProductPanel extends JPanel {
 	public ProductPanel(String id, String name, String type, String sellingprice, String quantity,
 			Controller.IncrementListener incrementListener, Controller.DecrementListener decrementListener) {
 		Name = name;
-		ID = String.valueOf(id);
-		Type = type;
+		String.valueOf(id);
 		Quantity = Integer.parseInt(quantity);
 		Sellingprice = Float.parseFloat(sellingprice);
 		IncrementListener = incrementListener;
 		DecrementListener = decrementListener;
 
 		createCheckoutComponents();
+	}
+
+	/**
+	 * Creates product panel admin
+	 *
+	 * @param name
+	 *            Name of product
+	 * @param price
+	 *            Price of product
+	 * @param count
+	 *            How many of the product is in stock
+	 */
+	public ProductPanel(String id, String type, String quantity, String invoiceprice, String sellingprice, String name, String description, 
+			Controller.StockIncrementListener incrementListener, Controller.StockDecrementListener decrementListener) {
+		Name = name;
+		String.valueOf(id);
+		Quantity = Integer.parseInt(quantity);
+		Sellingprice = Float.parseFloat(sellingprice);
+		StockIncrementListener = incrementListener;
+		StockDecrementListener = decrementListener;
+
+		createAdminComponents();
 	}
 
 	public JPanel getPanel() {
@@ -105,9 +124,39 @@ public class ProductPanel extends JPanel {
 		JPanel checkoutButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JPanel checkoutInfo = new JPanel(new FlowLayout());
 		checkoutInfo.add(new JLabel("$" + Sellingprice));
-		checkoutInfo.add(new JLabel("Amount: " + Quantity));
+		if(Quantity == 0){
+			checkoutInfo.add(new JLabel("REMOVE?"));
+		}else{
+			checkoutInfo.add(new JLabel("Amount: " + Quantity));
+		}
 		checkoutButtons.add(incrementCartButton(IncrementListener));
 		checkoutButtons.add(decrementCartButton(DecrementListener));
+		checkout.add(checkoutInfo, BorderLayout.NORTH);
+		checkout.add(checkoutButtons, BorderLayout.SOUTH);
+		product.setBackground(new Color(235, 232, 217));
+		product.add(checkout, BorderLayout.EAST);
+	}
+
+	private void createAdminComponents() {	
+		product = new JPanel(new BorderLayout());
+		product.setName(Name);
+		product.setBackground(new Color(235, 232, 217));
+		product.setBorder(new EmptyBorder(10, 5, 10, 5));
+	
+		product.add(prodImage("C:\\Users\\auste\\Downloads\\product.png"), BorderLayout.WEST);
+		product.add(new JLabel(Name), BorderLayout.NORTH);
+	
+		JPanel checkout = new JPanel(new BorderLayout());
+		JPanel checkoutButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		JPanel checkoutInfo = new JPanel(new FlowLayout());
+		checkoutInfo.add(new JLabel("$" + Sellingprice));
+		if(Quantity == 0){
+			checkoutInfo.add(new JLabel("REMOVE?"));
+		}else{
+			checkoutInfo.add(new JLabel("Amount: " + Quantity));
+		}
+		checkoutButtons.add(incrementCartButton(StockIncrementListener));
+		checkoutButtons.add(decrementCartButton(StockDecrementListener));
 		checkout.add(checkoutInfo, BorderLayout.NORTH);
 		checkout.add(checkoutButtons, BorderLayout.SOUTH);
 		product.setBackground(new Color(235, 232, 217));
@@ -164,5 +213,17 @@ public class ProductPanel extends JPanel {
 		decrement = new JButton("v");
 		decrement.addActionListener(decrementButton);
 		return decrement;
+	}
+	
+	public JButton incrementStockButton(ActionListener incrementButton) {
+		stockincrement = new JButton("^");
+		stockincrement.addActionListener(incrementButton);
+		return stockincrement;
+	}
+	
+	public JButton decrementStockButton(ActionListener decrementButton) {
+		stockdecrement = new JButton("v");
+		stockdecrement.addActionListener(decrementButton);
+		return stockdecrement;
 	}
 }

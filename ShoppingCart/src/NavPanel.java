@@ -7,25 +7,27 @@ import javax.swing.JPanel;
 public class NavPanel extends JPanel {
 	private JPanel NavPanel;
 	private JButton btnStore;
+	private JButton btnInventory;
+	private JButton btnFinance;
 	private JButton btnCheckout;
 	private JButton btnLogout;
 	private JLabel welcome;
 
 	/**
 	 * Create the panel.
+	 * @param accountTypeString 
 	 */
-	public NavPanel() {
+	public NavPanel(String accountTypeString) {
 		NavPanel = new JPanel();
 
 		welcome = new JLabel("");
 		NavPanel.add(welcome);
-
-		btnStore = new JButton("Store");
-		NavPanel.add(btnStore);
-
-		btnCheckout = new JButton("Checkout");
-		NavPanel.add(btnCheckout);
-
+		if(accountTypeString.equals("Admin")){
+			createAdminButtons();
+		}else{
+			createUserButtons();
+		}
+		
 		btnLogout = new JButton("Logout");
 		NavPanel.add(btnLogout);
 	}
@@ -33,8 +35,12 @@ public class NavPanel extends JPanel {
 	public void addStoreListener(ActionListener listenerForStore) {
 		btnStore.addActionListener(listenerForStore);
 	}
+	
+	public void addAdminListener(ActionListener listenerForStore) {
+		btnInventory.addActionListener(listenerForStore);
+	}
 
-	public void addCheckoutListener(ActionListener listenerForCheckout) {
+	public void addCartListener(ActionListener listenerForCheckout) {
 		btnCheckout.addActionListener(listenerForCheckout);
 	}
 
@@ -53,5 +59,27 @@ public class NavPanel extends JPanel {
 
 	public void removeWelcomeMessage(String string) {
 		NavPanel.remove(welcome);
+	}
+	
+	public void createAdminButtons(){
+		btnInventory = new JButton("Inventory");
+		NavPanel.add(btnInventory);
+		
+		btnFinance = new JButton("Finance");
+		NavPanel.add(btnFinance);
+
+		btnStore = new JButton("Store");
+		NavPanel.add(btnStore);
+		
+		btnCheckout = new JButton("Shopping Cart");
+		NavPanel.add(btnCheckout);
+	}
+	
+	public void createUserButtons(){
+		btnStore = new JButton("Store");
+		NavPanel.add(btnStore);
+
+		btnCheckout = new JButton("Shopping Cart");
+		NavPanel.add(btnCheckout);
 	}
 }

@@ -18,3 +18,11 @@
 /Controller$DecrementListener.class
 /AdminPanel.class
 /NavPanel.class
+/FooterPanel.class
+/Controller$CartListener.class
+/CheckoutPanel.class
+/Controller$StockDecrementListener.class
+/Controller$StockIncrementListener.class
+/Controller$AdminListener.class
+/FinancePanel.class
+/Controller$FinanceListener.class
