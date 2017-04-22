@@ -24,23 +24,23 @@ public class Model {
 	 * @param count
 	 * @param price
 	 */
-	public void cartAdd(String id, String name, String type, String price) {
+	public void cartAdd(String id, String name, String type, String price, String invoiceprice) {
 		boolean replace = true;
 		List<String[]> allLines = getCSV(CSVLocation);
-		String[] newCartItem = {"","","","",""};
+		String[] newCartItem = {"","","","","",""};
 		if(getStock(name) == 0){
 			return;
 		}
 		try {
 			for (String[] product : allLines) {
 				String cartName = product[1];
-				String cartQuantity = product[4];
+				String cartQuantity = product[5];
 				
 				if (cartName.equals(name)) {
 					System.out.print("IncrementCart: " + name + " - Price: " + price + " Count: " + cartQuantity);
 					cartQuantity = String.valueOf(Integer.parseInt(cartQuantity) + 1);
 					System.out.println(" -> " + cartQuantity);
-					product[4] = cartQuantity;
+					product[5] = cartQuantity;
 					replace = false;
 				}
 			}
@@ -54,7 +54,8 @@ public class Model {
 			newCartItem[1] = name;
 			newCartItem[2] = type;
 			newCartItem[3] = price;
-			newCartItem[4] = String.valueOf(1);
+			newCartItem[4] = invoiceprice;
+			newCartItem[5] = String.valueOf(1);
 			try {
 				allLines.add(newCartItem);
 			} catch (NullPointerException n) {
@@ -74,7 +75,7 @@ public class Model {
 			try {
 				for (String[] product : allLines) {
 					String cartName = product[1];
-					String cartQuantity = product[4];
+					String cartQuantity = product[5];
 					
 					if (cartName.equals(name)) {
 						if (Integer.parseInt(cartQuantity) > 0) {
@@ -86,7 +87,7 @@ public class Model {
 							writeCSV(allLines, filepath, false);
 							return;
 						}
-						product[4] = cartQuantity;
+						product[5] = cartQuantity;
 					}
 					x++;
 				}
@@ -98,6 +99,23 @@ public class Model {
 		incrementStock(name);
 		writeCSV(allLines, filepath, false);
 		return;
+	}
+
+	public void completeTransaction(String firstname, String lastname, String cc, String email, String address) {
+		List<String[]> sales = getCSV("sales.csv");
+		String[] newSale = new String[8];
+		
+		newSale[0] = String.valueOf(getCartTotal());//total
+		newSale[1] = String.valueOf(getCartCost());//cost
+		newSale[2] = Username;						//username
+		newSale[3] = firstname;//firstname
+		newSale[4] = lastname;//lastname
+		newSale[5] = cc;//email
+		newSale[6] = email;//email
+		newSale[7] = address;//address
+		
+		sales.add(newSale);
+		writeCSV(sales, "sales.csv", false);
 	}
 
 	void decrementStock(String name) {
@@ -281,6 +299,19 @@ public class Model {
 				e.printStackTrace();
 			}
 	}
+	
+	public void clearCSV(String csvlocation) {
+		try {
+			FileWriter writer = new FileWriter(csvlocation);
+			writer.write("");
+			writer.close();
+		} catch (NullPointerException n) {
+			System.out.println("csv is empty");
+			createAccountCSV(csvlocation);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Logs a user in to the store
@@ -372,7 +403,42 @@ public class Model {
 		float total = 0;
 		List<String[]> inventory = getCSV(CSVLocation);
 		for(String[] product : inventory){
-			total += Float.parseFloat(product[3]) * Integer.parseInt(product[4]);
+			total += Float.parseFloat(product[3]) * Integer.parseInt(product[5]);
+		}
+		return total;
+	}
+	
+	public float getCartCost() {
+		float total = 0;
+		List<String[]> inventory = getCSV(CSVLocation);
+		for(String[] product : inventory){
+			total += Float.parseFloat(product[4]) * Integer.parseInt(product[5]);
+		}
+		return total;
+	}
+	
+	public float getSaleTotal() {
+		float total = 0;
+		List<String[]> sales = getCSV("sales.csv");
+		for(String[] sale : sales){
+			if(sale[0].equals("Total")){
+				continue;
+			}else{
+				total += Float.parseFloat(sale[0]);
+			}
+		}
+		return total;
+	}
+	
+	public float getSaleCost() {
+		float total = 0;
+		List<String[]> sales = getCSV("sales.csv");
+		for(String[] sale : sales){
+			if(sale[0].equals("Total")){
+				continue;
+			}else{
+				total += Float.parseFloat(sale[1]);
+			}
 		}
 		return total;
 	}

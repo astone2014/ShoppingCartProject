@@ -32,20 +32,24 @@ public class NavPanel extends JPanel {
 		NavPanel.add(btnLogout);
 	}
 
-	public void addStoreListener(ActionListener listenerForStore) {
-		btnStore.addActionListener(listenerForStore);
+	public void addStoreListener(ActionListener listener) {
+		btnStore.addActionListener(listener);
 	}
 	
-	public void addAdminListener(ActionListener listenerForStore) {
-		btnInventory.addActionListener(listenerForStore);
+	public void addAdminListener(ActionListener listener) {
+		btnInventory.addActionListener(listener);
+	}
+	
+	public void addFinanceListener(ActionListener listener) {
+		btnFinance.addActionListener(listener);
 	}
 
-	public void addCartListener(ActionListener listenerForCheckout) {
-		btnCheckout.addActionListener(listenerForCheckout);
+	public void addCartListener(ActionListener listener) {
+		btnCheckout.addActionListener(listener);
 	}
 
-	public void addLogoutListener(ActionListener listenerForLogout) {
-		btnLogout.addActionListener(listenerForLogout);
+	public void addLogoutListener(ActionListener listener) {
+		btnLogout.addActionListener(listener);
 	}
 
 	public JPanel getPanel() {

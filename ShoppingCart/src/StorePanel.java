@@ -3,15 +3,20 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 public class StorePanel extends JPanel {
 	private JPanel store;
-	private JPanel productsPanel;
+	private JPanel ProductsPanel;
+	private JScrollPane scrollPane;
 	private NavPanel NavPanel;
+	private FinancePanel FinancePanel;
+	private CheckoutPanel CheckoutPanel;
 	private FooterPanel FooterPanel;
 	private int storeStatus = 0;
 
@@ -23,6 +28,7 @@ public class StorePanel extends JPanel {
 		createProductsPanel();
 		createNavigationPanel(accountTypeString);
 		createFooterPanel();
+		scrollPane = new JScrollPane(store);
 	}
 
 	/**
@@ -42,9 +48,9 @@ public class StorePanel extends JPanel {
 			++x;
 			ProductPanel newproduct = new ProductPanel(product[0], product[1], product[2], product[3],
 					product[4], product[5], product[6], buyNowListener[x]);
-			productsPanel.add(newproduct.getPanel());
+			ProductsPanel.add(newproduct.getPanel());
 		}
-		store.add(productsPanel, BorderLayout.CENTER);
+		store.add(ProductsPanel, BorderLayout.CENTER);
 		storeStatus = 1;
 	}
 	
@@ -66,24 +72,18 @@ public class StorePanel extends JPanel {
 			ProductPanel newproduct = new ProductPanel(product[0], product[1], product[2], product[3],
 					product[4], product[5], product[6], stockincrementListener[x], stockdecrementListener[x]);
 			++x;
-			productsPanel.add(newproduct.getPanel());
+			ProductsPanel.add(newproduct.getPanel());
 		}
-		store.add(productsPanel, BorderLayout.CENTER);
+		store.add(ProductsPanel, BorderLayout.CENTER);
 		storeStatus = 4;
 	}
 	
 	void viewFinance(List<String[]> finances) {
 		removeProductsFromDisplay();
-		for (String[] sale : finances) {
-			if(sale[0].equals("ID")){
-				continue;
-			}
-			FinancePanel financepanel = new FinancePanel(sale[0], sale[1], sale[2], sale[3],
-					sale[4], sale[5], sale[6]);
-			productsPanel.add(financepanel.getPanel());
-		}
-		store.add(productsPanel, BorderLayout.CENTER);
-		storeStatus = 4;
+		FinancePanel = new FinancePanel(finances);
+		ProductsPanel.add(FinancePanel.getPanel());
+		store.add(ProductsPanel, BorderLayout.CENTER);
+		storeStatus = 5;
 	}
 
 	/**
@@ -104,31 +104,20 @@ public class StorePanel extends JPanel {
 			if(product[0].equals("ID")){
 				continue;
 			}
-			ProductPanel newproduct = new ProductPanel(product[0], product[1], product[2], product[3], product[4], 
+			ProductPanel newproduct = new ProductPanel(product[0], product[1], product[2], product[3], product[4], product[5], 
 					incrementListener[x], decrementListener[x]);
 			++x;
-			productsPanel.add(newproduct.getPanel());
+			ProductsPanel.add(newproduct.getPanel());
 		}
-		store.add(productsPanel, BorderLayout.CENTER);
+		store.add(ProductsPanel, BorderLayout.CENTER);
 		storeStatus = 2;
 	}
 	
 	public void viewCheckout(float total) {
 		removeProductsFromDisplay();
-		store.add(productsPanel, BorderLayout.CENTER);
-		productsPanel.add(new JLabel("TOTAL: $" + total));
-		String[] requiredFields = {"First Name: ", "Last Name: ", "Email: ", "Address: "};
-		for(String field: requiredFields){
-			productsPanel.add(new JLabel(field));
-			JTextField newfield = new JTextField();
-			productsPanel.add(newfield);
-			newfield.setColumns(10);
-		}
-		productsPanel.add(new JLabel("CC: "));
-		JTextField cc = new JTextField();
-		cc.setColumns(10);
-		cc.setText("0000 1111 2222 3333 4444");
-		productsPanel.add(cc);
+		CheckoutPanel = new CheckoutPanel(total);
+		ProductsPanel.add(CheckoutPanel.getPanel());
+		store.add(ProductsPanel, BorderLayout.CENTER);
 		storeStatus = 3;
 	}
 
@@ -136,8 +125,8 @@ public class StorePanel extends JPanel {
 	 * Removes all products from display
 	 */
 	public void removeProductsFromDisplay() {
-		productsPanel.removeAll();
-		store.remove(productsPanel);
+		ProductsPanel.removeAll();
+		store.remove(ProductsPanel);
 	}
 
 	/**
@@ -146,7 +135,7 @@ public class StorePanel extends JPanel {
 	 * @return true is display false if not displayed
 	 */
 	public boolean isProductsPanelDisplayed() {
-		if (productsPanel.getParent() == null)
+		if (ProductsPanel.getParent() == null)
 			return false;
 		else
 			return true;
@@ -158,7 +147,7 @@ public class StorePanel extends JPanel {
 	 * @return true is display false if not displayed
 	 */
 	public boolean isCheckoutPanelDisplayed() {
-		if (productsPanel.getParent() == null)
+		if (ProductsPanel.getParent() == null)
 			return false;
 		else
 			return true;
@@ -172,6 +161,10 @@ public class StorePanel extends JPanel {
 	public JPanel getPanel() {
 		return store;
 	}
+	
+	public JScrollPane getScrollPane() {
+		return scrollPane;
+	}
 
 	/**
 	 * Returns the panel of the navigation.
@@ -180,6 +173,10 @@ public class StorePanel extends JPanel {
 	 */
 	public NavPanel getNav() {
 		return NavPanel;
+	}
+	
+	public CheckoutPanel getCheckout() {
+		return CheckoutPanel;
 	}
 	
 	public FooterPanel getFooter() {
@@ -195,14 +192,14 @@ public class StorePanel extends JPanel {
 		store.setBorder(new EmptyBorder(10, 5, 10, 5));
 	}
 
-	/**
+	/** b
 	 * Creates the products panel.
 	 */
 	public void createProductsPanel() {
-		productsPanel = new JPanel();
-		productsPanel.setLayout(new FlowLayout(0, 10, 10));
-		productsPanel.setBackground(new Color(255, 255, 255));
-		productsPanel.setBounds(100, 100, 100, 100);
+		ProductsPanel = new JPanel();
+		ProductsPanel.setLayout(new WrapLayout());
+		ProductsPanel.setBackground(new Color(255, 255, 255));
+		ProductsPanel.setBounds(100, 100, 100, 100);
 	}
 
 /**
@@ -239,7 +236,9 @@ public class StorePanel extends JPanel {
 	 * @return displayed store page
 	 */
 	public String getCurrentView() {
-		if (storeStatus == 4)
+		if (storeStatus == 5)
+			return "Finance";
+		else if (storeStatus == 4)
 			return "Admin";
 		else if (storeStatus == 3)
 			return "Checkout";

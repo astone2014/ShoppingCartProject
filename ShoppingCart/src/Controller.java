@@ -37,14 +37,17 @@ public class Controller {
 					store.getNav().addCartListener(new CartListener());
 					store.getNav().addLogoutListener(new LogoutListener());
 					store.getFooter().addCheckoutListener(new CheckoutListener());
+					store.getFooter().completeTransactionListener(new CompleteTransactionListener());
 					model.setAccountUsername(login.getUserName());
 					view.removePanel(login.getPanel());
 					view.addPanel(store.getPanel());
 					if(model.getAccountTypeString().equals("Admin")){
 						store.getNav().addAdminListener(new AdminListener());
+						store.getNav().addFinanceListener(new FinanceListener());
 						store.viewAdmin(model.getCSV("products.csv"), createStockIncrementListeners(model.getCSV("products.csv").size()), createStockDecrementListeners(model.getCSV("products.csv").size()));
 						store.getNav().addWelcomeMessage(("Welcome " + model.getAccountTypeString() + " " + model.getAccountUsername()));
-						store.getFooter().setTotalText(model.getCartTotal());
+						store.getFooter();
+						FooterPanel.setTotalText(model.getCartTotal());
 						view.viewRefresh();
 					}else{
 						store.viewProducts(model.getCSV("products.csv"),
@@ -95,7 +98,7 @@ public class Controller {
 	
 	class FinanceListener implements ActionListener {
 		public void actionPerformed(ActionEvent a) {
-			displayAdmin();
+			displayFinance();
 		}
 	}
 
@@ -116,18 +119,20 @@ public class Controller {
 		private String Name;
 		private String Type;
 		private String Price;
+		private String InvoicePrice;
 
-		public BuyNowListener(String id, String name, String type, String price) {
+		public BuyNowListener(String id, String name, String type, String price, String invoiceprice) {
 			ID = id;
 			Name = name;
 			Type = type;
 			Price = price;
+			InvoicePrice = invoiceprice;
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			if(model.getStock(Name) == 0){
 			}else{
-				model.cartAdd(ID, Name, Type, Price);
+				model.cartAdd(ID, Name, Type, Price, InvoicePrice);
 				store.viewProducts(model.getCSV("products.csv"),
 				createBuyNowListeners(model.getCSV("products.csv").size()));
 				FooterPanel.setTotalText(model.getCartTotal());
@@ -137,7 +142,12 @@ public class Controller {
 	}
 
 	class IncrementListener implements ActionListener {
+		private String ID;
 		private String Name;
+		private String Type;
+		private String Price;
+		private String InvoicePrice;
+		
 		/**
 		 * creates increment listener
 		 * @param name
@@ -145,15 +155,20 @@ public class Controller {
 		 * @param id 
 		 * @param type 
 		 */
-		public IncrementListener(String id, String name, String type, String price) {
+
+		public IncrementListener(String id, String name, String type, String price, String invoiceprice) {
+			ID = id;
 			Name = name;
+			Type = type;
+			Price = price;
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			model.incrementStock(Name);
-			store.viewAdmin(model.getCSV("products.csv"),
-					createStockIncrementListeners(model.getCSV("products.csv").size()),
-					createStockDecrementListeners(model.getCSV("products.csv").size()));
+			model.cartAdd(ID, Name, Type, Price, InvoicePrice);
+			store.viewCart(model.getCSV(model.getAccountCSVLocation()),
+					createIncrementListeners(model.getCSV(model.getAccountCSVLocation()).size()),
+					createDecrementListeners(model.getCSV(model.getAccountCSVLocation()).size()));
 			FooterPanel.setTotalText(model.getCartTotal());
 			view.viewRefresh();
 		}
@@ -229,6 +244,12 @@ public class Controller {
 		}
 	}
 	
+	class CompleteTransactionListener implements ActionListener {
+		public void actionPerformed(ActionEvent a) {
+			completeTransaction();
+		}
+	}
+	
 	// <------Create Listener Arrays------>
 	/**
 	 * Creates button listeners.
@@ -250,9 +271,10 @@ public class Controller {
 				++count;
 				String name = product[5];
 				String price = product[4];
+				String invoiceprice = product[3];
 				String type = product[1];
 				String id = product[0];
-				buynowlistenerarray[count] = new BuyNowListener(id, name, type, price);
+				buynowlistenerarray[count] = new BuyNowListener(id, name, type, price, invoiceprice);
 			}
 			return buynowlistenerarray;
 		}
@@ -272,7 +294,8 @@ public class Controller {
 				String name = product[1];
 				String type = product[2];
 				String price = product[3];
-				incrementlistenerarray[count] = new IncrementListener(id, name, type, price);
+				String invoiceprice = product[4];
+				incrementlistenerarray[count] = new IncrementListener(id, name, type, price, invoiceprice);
 				++count;
 			}
 			return incrementlistenerarray;
@@ -351,9 +374,12 @@ public class Controller {
 		if (store.getCurrentView().equals("Store")) {
 			System.out.println("You're already on the store page.");
 		} else {
+			store.getPanel().add(store);
+			view.add(store.getPanel());
 			store.removeProductsFromDisplay();
 			store.viewProducts(model.getCSV("products.csv"),
 					createBuyNowListeners(model.getCSV("products.csv").size()));
+			FooterPanel.addCheckoutBtn();
 			view.viewRefresh();
 		}
 	}
@@ -370,6 +396,7 @@ public class Controller {
 			store.viewCart(model.getAccountCart(),
 					createIncrementListeners(model.getCSV(model.getAccountCSVLocation()).size()),
 					createDecrementListeners(model.getCSV(model.getAccountCSVLocation()).size()));
+			FooterPanel.addCheckoutBtn();
 			view.viewRefresh();
 		}
 	}
@@ -386,6 +413,7 @@ public class Controller {
 			store.viewAdmin(model.getCSV("products.csv"),
 					createStockIncrementListeners(model.getCSV("products.csv").size()),
 					createStockDecrementListeners(model.getCSV("products.csv").size()));
+			FooterPanel.addCheckoutBtn();
 			view.viewRefresh();
 		}
 	}
@@ -400,6 +428,11 @@ public class Controller {
 			view.addPanel(store.getPanel());
 			store.removeProductsFromDisplay();
 			store.viewFinance(model.getCSV("sales.csv"));
+			
+			FooterPanel.addCheckoutBtn();
+			FinancePanel.setRevenue(model.getSaleTotal());
+			FinancePanel.setCost(model.getSaleCost());
+			FinancePanel.setProfit(model.getSaleTotal() - model.getSaleCost());
 			view.viewRefresh();
 		}
 	}
@@ -407,14 +440,16 @@ public class Controller {
 	/**
 	 * Displays the checkout
 	 */
-	public void displayCheckout() {
-		if (store.getCurrentView().equals("Checkout")) {
-			System.out.println("You're already on the checkout page.");
-		} else {
-			store.removeProductsFromDisplay();
-			store.viewCheckout(model.getCartTotal());
-			view.viewRefresh();
-		}
+	public void displayCheckout(){ 
+		store.removeProductsFromDisplay();
+		store.viewCheckout(model.getCartTotal());
+		store.getCheckout();
+		store.getFooter();
+		CheckoutPanel.setTotalText(model.getCartTotal());
+		FooterPanel.addCompleteTransactionBtn(new CompleteTransactionListener());
+		store.getFooter().removeCheckoutBtn();
+		store.viewCheckout(model.getCartTotal());
+		view.viewRefresh();
 	}
 
 	/**
@@ -429,6 +464,20 @@ public class Controller {
 		}
 	}
 
+	public void completeTransaction(){
+		System.out.println("COMPLETE TRANSACTION: " + CheckoutPanel.getFirstName());
+		
+		store.getCheckout();
+		model.completeTransaction(CheckoutPanel.getFirstName(), CheckoutPanel.getLastName(), CheckoutPanel.getCreditCard(), CheckoutPanel.getEmail(), CheckoutPanel.getAddress());
+		model.clearCSV(model.getAccountCSVLocation());
+		
+		store.removeProductsFromDisplay();
+		store.viewProducts(model.getCSV("products.csv"), createBuyNowListeners(model.getCSV("products.csv").size()));
+		FooterPanel.addCheckoutBtn();
+		FooterPanel.setTotalText(model.getCartTotal());
+		view.viewRefresh();
+	}
+	
 	/**
 	 * Displays the signup page
 	 */
